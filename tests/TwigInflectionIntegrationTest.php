@@ -1,16 +1,28 @@
 <?php
 
-class TwigInflectionIntegrationTest extends \Twig_Test_IntegrationTestCase
+use DaveDevelopment\TwigInflection\Twig\Extension\Inflection;
+use Twig\Test\IntegrationTestCase;
+
+/**
+ *
+ */
+class TwigInflectionIntegrationTest extends IntegrationTestCase
 {
-    public function getExtensions()
+    /**
+     * @return array
+     */
+    public function getExtensions(): array
     {
-        return array(
-            new \DaveDevelopment\TwigInflection\Twig\Extension\Inflection(),
-        );
+        return [
+            new Inflection(),
+        ];
     }
 
-    public function getFixturesDir()
+    /**
+     * @return string
+     */
+    public function getFixturesDir(): string
     {
-        return dirname(__FILE__).'/Fixtures/';
-    } 
+        return __DIR__ . '/Fixtures/';
+    }
 }

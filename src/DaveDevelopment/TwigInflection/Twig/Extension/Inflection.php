@@ -2,68 +2,95 @@
 
 namespace DaveDevelopment\TwigInflection\Twig\Extension;
 
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
+use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
-class Inflection extends \Twig_Extension
+/**
+ *
+ */
+class Inflection extends AbstractExtension
 {
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return "TwigInflection";
     }
 
-    public function getFilters()
+    /**
+     * @return TwigFilter[]
+     */
+    public function getFilters(): array
     {
-        return array(
-            new TwigFilter('pluralize', __CLASS__.'::pluralize'),
-            new TwigFilter('singularize', __CLASS__.'::singularize'),
-        );
+        return [
+            new TwigFilter('pluralize', __CLASS__ . '::pluralize'),
+            new TwigFilter('singularize', __CLASS__ . '::singularize'),
+        ];
     }
 
     /**
-     * Singularize the $plural word if count == 1. If $singular is passed, it 
+     * Singularize the $plural word if count == 1. If $singular is passed, it
      * will be used instead of trying to use doctrine\inflector
      *
-     * @param string  $plural   - chicken
-     * @param int     $count      - e.g. 4
-     * @param string  $singular     - (optional) chickens
-     * @return string             
+     * @param string      $plural   - chicken
+     * @param int         $count    - e.g. 4
+     * @param string|null $singular - (optional) chickens
+     *
+     * @return string
      */
-    public static function singularize($plural, $count = 1, $singular = null)
+    public static function singularize(string $plural, int $count = 1, ?string $singular = null): string
     {
-        $count = intval($count);
-
-        if ($count != 1) {
+        if ($count !== 1) {
             return $plural;
         }
 
-        if (null == $singular) {
-            $singular = \Doctrine\Common\Inflector\Inflector::singularize($plural);
-        } 
+        if (null === $singular) {
+            $singular = self::getInflector()->singularize($plural);
+        }
 
         return $singular;
     }
 
     /**
-     * Pluralize the $singular word if count !== 1. If $plural is passed, it 
+     * Pluralize the $singular word if count !== 1. If $plural is passed, it
      * will be used instead of trying to use doctrine\inflector
      *
-     * @param string  $singular   - chicken
-     * @param int     $count      - e.g. 4
-     * @param string  $plural     - (optional) chickens
-     * @return string             
+     * @param string      $singular - chicken
+     * @param int         $count    - e.g. 4
+     * @param string|null $plural   - (optional) chickens
+     *
+     * @return string
      */
-    public static function pluralize($singular, $count = 2, $plural = null)
+    public static function pluralize(string $singular, int $count = 2, ?string $plural = null): string
     {
-        $count = intval($count);
-
-        if ($count == 1) {
+        if ($count === 1) {
             return $singular;
         }
 
-        if (null == $plural) {
-            $plural = \Doctrine\Common\Inflector\Inflector::pluralize($singular);
-        } 
+        if (null === $plural) {
+            $plural = self::getInflector()->pluralize($singular);
+        }
 
         return $plural;
+    }
+
+    /**
+     * @var Inflector|null
+     */
+    private static ?Inflector $INFLECTOR = null;
+
+    /**
+     * @return Inflector
+     */
+    private static function getInflector(): Inflector
+    {
+        if (null === self::$INFLECTOR) {
+            self::$INFLECTOR = InflectorFactory::create()->build();
+        }
+
+        return self::$INFLECTOR;
     }
 }
